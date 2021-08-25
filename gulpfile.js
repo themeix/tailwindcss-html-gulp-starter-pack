@@ -9,29 +9,30 @@
     'use strict';
 /*
 =============================
-	Configure Options & Files 
+	Configure Options & Files
 =============================
 */
     var File_Name = 'html-name.zip';
     var CSS_Files = [
-    './node_modules/tailwindcss/dist/tailwind.css',  
+    // './node_modules/tailwindcss/dist/tailwind.css',
+    './assets/css/tailwind.css',
  	'./node_modules/aos/dist/aos.css'
-		
+
     ];
     var JS_Files = [
-	'./node_modules/aos/dist/aos.js',  
+	'./node_modules/aos/dist/aos.js',
 	'./assets/js/app.js'
     ];
-	
+
     var Production_CSS_Files = [
 	'./dist/production/assets/css/aos.css',
 	'./dist/production/assets/css/style.min.css'
-    ];	
-	
+    ];
+
     var Production_JS_Files = [
-	'./dist/production/assets/js/app.js'	
- 
-    ];	
+	'./dist/production/assets/js/app.js'
+
+    ];
 /*
 =============================
 	Include Gulp & Plugins
@@ -41,7 +42,7 @@
 		sass 			= require('gulp-sass')(require('sass')),
 		cleanCSS 		= require('gulp-clean-css'),
 		autoprefixer 	= require('gulp-autoprefixer'),
-		concat 			= require('gulp-concat'),		
+		concat 			= require('gulp-concat'),
 		rename 			= require('gulp-rename'),
 		uglify 			= require('gulp-uglify'),
 		terser 			= require('gulp-terser'),
@@ -51,38 +52,39 @@
 		replace 		= require('gulp-replace'),
 		size 			= require('gulp-size'),
 		zip 			= require('gulp-zip'),
-		
-		postcss 		= require('postcss'),	
+
+		// postcss 		= require('postcss'),
 		atimport 		= require("postcss-import"),
-		purgecss 		= require("@fullhuman/postcss-purgecss"),	
+		purgecss 		= require("@fullhuman/postcss-purgecss"),
 		tailwindcss 	= require("tailwindcss"),
-		
+
 		del 			= require('del'),
 		gulpCopy 		= require('gulp-copy'),
 		runSequence 	= require('run-sequence'),
-		inject 			= require('gulp-inject')
-  
-  
+		inject 			= require('gulp-inject'),
+        postcss         = require("gulp-postcss");
+
+
       gulp.task('sass', function(done) {
         return gulp.src('./assets/scss/*.scss')
             .pipe(plumber({
                // errorHandler: onError
             }))
-            .pipe(sass())				
+            .pipe(sass())
             .pipe(autoprefixer())
             .pipe(gulp.dest('./assets/css'))
             .pipe(rename({
                 suffix: '.min'
             }))
-			
 
-			
+
+
             .pipe(cleanCSS())
             .pipe(gulp.dest('./assets/css'))
             .pipe(size())
         done();
     });
- 
+
     gulp.task('clean-production', function() {
         return del('dist/**/**', {
             force: true
@@ -102,7 +104,7 @@
 
         done();
     });
-	
+
     gulp.task('copy_all_files', function(done) {
         return gulp.src([
                 './**/*',
@@ -152,8 +154,8 @@
             .pipe(gulp.dest('./dist/production'))
     });
 
- 
-	
+
+
     gulp.task('production-zip', function(done) {
         gulp.src([
                 './dist/production/**/*',
@@ -170,14 +172,13 @@
     gulp.task('vendor_css', function(done) {
         return gulp.src(CSS_Files)
             .pipe(concat('vendors.css'))
-			
+
 			 // NEED TO ADD TAILWIND PRE PROSS TO OPTIMIZE FILE SIZE
-			 
+            .pipe(postcss())
             .pipe(rename({
                 suffix: '.min'
-            }))		
-			
-			
+            }))
+
             .pipe(cleanCSS())
             .pipe(gulp.dest('./assets/css'))
             .pipe(size())
@@ -247,10 +248,10 @@
 
     gulp.task(
         'production',
-        gulp.series('clean-production', 'copy_all_files', 'copy_css_files', 'copy_js_files', 'inject_code_html', 'inject_code_html_2', 'remove_extra_code', 'production-zip', 'zip')
+        gulp.series('clean-production', 'copy_all_files', 'copy_css_files', 'copy_js_files', 'inject_code_html', 'inject_code_html_2', 'remove_extra_code', 'production-zip', 'zip',)
     );
 
- 
+
 
     gulp.task(
         'default',
